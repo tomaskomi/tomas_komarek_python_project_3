@@ -1,35 +1,20 @@
-"""
-projekt_3.py: třetí projekt do Engeto Online Python Akademie
-author: Tomáš Komárek
-email: tomaskomi@gmail.com
-discord: tomaskomi
-"""
-
 import sys
 import requests
 from bs4 import BeautifulSoup
 import csv
 
-# Globální proměnná pro počet cyklů
-pocet_cyklu = -1
 
 def stahni_stranku(url):
     """Stáhne stránku a vrátí BeautifulSoup objekt"""
     response = requests.get(url)
     return BeautifulSoup(response.text, "html.parser")
 
-# Zde dáme do try-except bloku ověření, zda byly zadány vstupní argumenty
-try:
-    url = sys.argv[1]
-    vystupni_soubor = sys.argv[2]
-except IndexError:
-    print("Zadejte správné argumenty (URL a název výstupního souboru).")
-    sys.exit(1)
 
 def najdi_vysledky_stran(soup):
     """Najde počet hlasů pro jednotlivé kandidující strany"""
     vysledky_stran = soup.find_all("table", {"class": "table"})[1:]
     return [td.text.strip() for tabulka in vysledky_stran for td in tabulka.find_all("td")][2:-5:5]
+
 
 def najdi_souhrnne_vysledky(soup):
     """Najde souhrné hodnoty na úrovni jednotlivých obcí"""
@@ -37,13 +22,16 @@ def najdi_souhrnne_vysledky(soup):
     indexy = [3, 4, 7]
     return [vysledky[i].text for i in indexy]
 
+
 def najdi_nazev_obce(soup):
     """Najde název obce pro příslušný cyklus"""
     return [td.text for index, td in enumerate(soup.find_all('td', {'class': 'overflow_name'})) if index == pocet_cyklu]
 
+
 def najdi_kod_obce(soup):
     """Najde kód obce pro příslušný cyklus"""
     return [td.text for index, td in enumerate(soup.find_all("td", {"class": "cislo"})) if index == pocet_cyklu]
+
 
 def vypis_vysledky(plny_odkaz, url):
     """Vypíše kompletní data o výsledcích v obci"""
@@ -51,7 +39,9 @@ def vypis_vysledky(plny_odkaz, url):
     pocet_cyklu += 1
     soup_obce = stahni_stranku(plny_odkaz)
     soup = stahni_stranku(url)
-    return najdi_kod_obce(soup) + najdi_nazev_obce(soup) + najdi_souhrnne_vysledky(soup_obce) + najdi_vysledky_stran(soup_obce)
+    return najdi_kod_obce(soup) + najdi_nazev_obce(soup) + najdi_souhrnne_vysledky(soup_obce) + najdi_vysledky_stran(
+        soup_obce)
+
 
 def zapis_prvni_radek(writer):
     """Vypíše první řádek tabulky s názvy sloupců"""
@@ -65,6 +55,7 @@ def zapis_prvni_radek(writer):
                "REALISTÉ", "SPORTOVCI", "Dělnic.str.sociální spravedl.", "Svob.a př.dem.-T.Okamura (SPD)",
                "Strana Práv Občanů"]
     writer.writerow(sloupce)
+
 
 def scrapuj_a_zapis(url, vystupni_soubor):
     """Scrapuje data a zapisuje je do CSV souboru"""
@@ -88,7 +79,13 @@ def scrapuj_a_zapis(url, vystupni_soubor):
                 except Exception as e:
                     continue
 
-try:
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Zadejte správné argumenty (URL a název výstupního souboru).")
+        sys.exit(1)
+
+    url = sys.argv[1]
+    vystupni_soubor = sys.argv[2]
+
     scrapuj_a_zapis(url, vystupni_soubor)
-except (TypeError, NameError):
-    print("Zadejte správné argumenty (URL a název výstupního souboru).")
