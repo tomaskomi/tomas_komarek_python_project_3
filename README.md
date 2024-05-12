@@ -15,6 +15,11 @@ $ pip install -r requirements.txt    #instalace knihoven
 
 **Spouštění projektu**
 
+Spušění souboru v rámci příkazového řádku vyžaduje dva argumenty. Po spuštění program uloží výsledky do souboru s příponou .csv. 
+
+python election_scraper.py <url_uzemniho_celku> <vysledny_soubor> 
+
+
 
 
 
