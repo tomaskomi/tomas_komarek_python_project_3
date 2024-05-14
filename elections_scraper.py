@@ -1,3 +1,10 @@
+"""
+projekt_3.py: třetí projekt do Engeto Online Python Akademie
+author: Tomáš Komárek
+email: tomaskomi@gmail.com
+discord: tomaskomi
+"""
+
 import sys
 import requests
 from bs4 import BeautifulSoup
